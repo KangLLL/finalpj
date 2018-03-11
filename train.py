@@ -18,9 +18,10 @@ save_dir = "./savedModels"
 
 
 def loadData(batch_size):
-    trans = transforms.Compose(
-                                # [transforms.Resize([227,227]),
-                                transforms.ToTensor()])
+    trans = transforms.Compose([
+        # transforms.Resize([227, 227]),
+        transforms.ToTensor()
+    ])
     image_datasets = {x: CXRDataset(data_path[x], data_dir, transform=trans) for x in ['train', 'test']}
     dataloders = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4)
                   for x in ['train', 'test']}
