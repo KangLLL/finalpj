@@ -12,16 +12,16 @@ import numpy as np
 import time
 import os
 
-data_dir = "/scratch/liaoi/images"
+#data_dir = "/scratch/liaoi/images"
+data_dir = "../images"
 data_path = {'train': "./Train_Label.csv", 'test': "Test_Label.csv"}
 save_dir = "./savedModels"
 
 
 def loadData(batch_size):
     trans = transforms.Compose([
-        # transforms.Resize([227, 227]),
-        transforms.ToTensor()
-    ])
+	transforms.Resize([227,227]),
+        transforms.ToTensor()])
     image_datasets = {x: CXRDataset(data_path[x], data_dir, transform=trans) for x in ['train', 'test']}
     dataloders = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4)
                   for x in ['train', 'test']}
@@ -171,8 +171,8 @@ def saveInfo(model):
 if __name__ == '__main__':
     model = Model()
     optimizer = optim.Adam([
-        {'params': model.transition.parameters()},
-        {'params': model.globalPool.parameters()},
+        #{'params': model.transition.parameters()},
+        #{'params': model.globalPool.parameters()},
         {'params': model.prediction.parameters()}],
         lr=3e-5)
 
