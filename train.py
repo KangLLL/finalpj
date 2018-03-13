@@ -12,16 +12,16 @@ import numpy as np
 import time
 import os
 
-data_dir = "/scratch/liaoi/images"
+#data_dir = "/scratch/liaoi/images"
+data_dir = "../images"
 data_path = {'train': "./Train_Label.csv", 'test': "Test_Label.csv"}
 save_dir = "./savedModels"
 
 
 def loadData(batch_size):
     trans = transforms.Compose([
-        # transforms.Resize([227, 227]),
-        transforms.ToTensor()
-    ])
+	transforms.Resize([227,227]),
+        transforms.ToTensor()])
     image_datasets = {x: CXRDataset(data_path[x], data_dir, transform=trans) for x in ['train', 'test']}
     dataloders = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4)
                   for x in ['train', 'test']}
@@ -137,6 +137,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
                 phase, epoch_loss, epoch_auc_ave, epoch_auc))
             print()
             for i, c in enumerate(class_names):
+        	#print('{}: {:.4f} '.format(c, epoch_auc))
                 print('{}: {:.4f} '.format(c, epoch_auc[i]))
             print()
 
@@ -154,6 +155,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
     print('Best val AUC: {:4f}'.format(best_auc_ave))
     print()
     for i, c in enumerate(class_names):
+        #print('{}: {:.4f} '.format(c, epoch_auc))
         print('{}: {:.4f} '.format(c, epoch_auc[i]))
 
     # load best model weights
@@ -171,10 +173,12 @@ def saveInfo(model):
 if __name__ == '__main__':
     model = Model()
     optimizer = optim.Adam([
-        {'params': model.transition.parameters()},
-        {'params': model.globalPool.parameters()},
+        #{'params': model.transition.parameters()},
+        #{'params': model.globalPool.parameters()},
+        {'params': model.model_ft.parameters()},
+        {'params': model.classifier.parameters()},
         {'params': model.prediction.parameters()}],
-        lr=3e-5)
+        lr=1e-4)
 
     model.cuda()
     model = train_model(model, optimizer, num_epochs=5)
