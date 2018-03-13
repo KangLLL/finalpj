@@ -137,6 +137,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
                 phase, epoch_loss, epoch_auc_ave, epoch_auc))
             print()
             for i, c in enumerate(class_names):
+        	#print('{}: {:.4f} '.format(c, epoch_auc))
                 print('{}: {:.4f} '.format(c, epoch_auc[i]))
             print()
 
@@ -154,6 +155,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
     print('Best val AUC: {:4f}'.format(best_auc_ave))
     print()
     for i, c in enumerate(class_names):
+        #print('{}: {:.4f} '.format(c, epoch_auc))
         print('{}: {:.4f} '.format(c, epoch_auc[i]))
 
     # load best model weights
@@ -173,8 +175,10 @@ if __name__ == '__main__':
     optimizer = optim.Adam([
         #{'params': model.transition.parameters()},
         #{'params': model.globalPool.parameters()},
+        {'params': model.model_ft.parameters()},
+        {'params': model.classifier.parameters()},
         {'params': model.prediction.parameters()}],
-        lr=3e-5)
+        lr=1e-4)
 
     model.cuda()
     model = train_model(model, optimizer, num_epochs=5)

@@ -1,11 +1,13 @@
 import torch.nn as nn
+import torch.nn.functional as F
 from torchvision import models
 
 class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
 	
-	self.model_ft = models.vgg11(pretrained=False, num_classes=1)
+	#self.model_ft = models.vgg19_bn(pretrained=True)
+	self.model_ft = models.densenet201(pretrained=True)
 	
         #self.model_ft = models.resnet50(pretrained=True)
         #for param in self.model_ft.parameters():
@@ -17,12 +19,30 @@ class Model(nn.Module):
 
 	#numm_ftrs = self.model_ft.fc.in_features
 	#self.model_ft.fc = nn.Linear(num_ftrs, 8)
+	
+	
+	#self.fc = nn.Sequential(
+        #    nn.Linear(512 * 7 * 7, 4096),
+        #    nn.ReLU(True),
+        #    nn.Dropout(),
+        #    nn.Linear(4096, 4096),
+        #    nn.ReLU(True),
+        #    nn.Dropout(),
+        #    nn.Linear(4096, 1),
+        #)
+	#self.fc = nn.Linear(num_ftrs, 1)
+	#self.fc = nn.Linear(4096,1)
+	
+	self.classifier = nn.Linear(1920, 8)
 	self.prediction = nn.Sigmoid()
 
 
 
     def forward(self, x):
-        #x = self.model_ft.conv1(x)
+	#x = self.model_ft.features(x)
+        #x = x.view(x.size(0), -1)
+        #x = self.fc(x)
+	#x = self.prediction(x)
         #x = self.model_ft.bn1(x)
         #x = self.model_ft.relu(x)
         #x = self.model_ft.maxpool(x)
@@ -37,7 +57,14 @@ class Model(nn.Module):
         #x = self.globalPool(x)
         #x = x.view(x.size(0), -1)
         #x = self.prediction(x)#14
-	x = self.model_ft(x)
-	x = self.prediction(x)
-        return x
+	#x = self.model_ft(x)
+	#x = self.prediction(x)
+        
+	
+	features = self.model_ft.features(x)
+        out = F.relu(features, inplace=True)
+        out = F.avg_pool2d(out, kernel_size=7, stride=1).view(features.size(0), -1)
+        #print(out)
+	x = self.classifier(out)
+	return x
 
