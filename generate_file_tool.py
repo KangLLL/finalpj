@@ -1,5 +1,6 @@
 import numpy as np
 import csv
+import random
 
 def transformFile(train_array, test_array, train_file_name, test_file_name):
     new_columns = ['FileName',
@@ -10,8 +11,8 @@ def transformFile(train_array, test_array, train_file_name, test_file_name):
                    'Mass',
                    'Nodule',
                    'Pneumonia',
-                   'Pneumothorax']
-
+                   'Pneumothorax'
+                   ]
     with open('./Data_Entry_2017.csv') as f:
         with open(train_file_name, "w+") as wf_train:
             with open(test_file_name, "w+") as wf_test:
@@ -36,11 +37,35 @@ def transformFile(train_array, test_array, train_file_name, test_file_name):
                             data.append(0)
 
                     temp = np.array(data[1:])
-                    if row[1] == 'No Finding' or sum(temp == 1) > 0 :
-                        if data[0] in test_array:
-                            writer_test.writerow(data)
-                        else:
-                            writer_train.writerow(data)
+                    if data[0] in test_array:
+                        if row[1] == 'No Finding' or sum(temp == 1) > 0:
+                            if random.randint(1, 20) > 15:
+                                writer_test.writerow(data)
+                        # if row[1] == 'No Finding' and test_no_count < test_have_count:
+                        #     test_no_count += 1
+                        #     writer_test.writerow(data)
+                        # elif sum(temp == 1) > 0:
+                        #     if l == 0:
+                        #         test_have_count += 1
+                        #         writer_test.writerow(data)
+                        #         l = 10
+                        #     else:
+                        #         l -= 1
+
+                    else:
+                        if row[1] == 'No Finding' or sum(temp == 1) > 0:
+                            if random.randint(1, 20) > 15:
+                                writer_train.writerow(data)
+                        # if row[1] == 'No Finding' and train_no_count < train_have_count:
+                        #     train_no_count += 1
+                        #     writer_train.writerow(data)
+                        # elif sum(temp == 1) > 0:
+                        #     if k == 0:
+                        #         train_have_count += 1
+                        #         writer_train.writerow(data)
+                        #         k = 10
+                        #     else:
+                        #         k -= 1
 
 def getTxtContent(txt_file):
     result = []
