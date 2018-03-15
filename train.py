@@ -16,7 +16,7 @@ import os
 import sys
 
 data_dir = "/scratch/liaoi/images_227"
-#data_dir = "/scratch/liaoi/images"
+# data_dir = "/scratch/liaoi/images"
 # data_dir = "../images"
 data_path = {'train': './train.csv', 'test': './test.csv'}
 txt_path = {'train': './train_text.csv', 'test': './test_text.csv'}
@@ -80,6 +80,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=8, core=0, need_txt=
                 # get the inputs
                 inputs = data['image']
                 labels = data['label']
+                texts = data['txt'] if need_txt else []
 
                 # calculate weight for loss
                 P = 0
@@ -100,16 +101,25 @@ def train_model(model, optimizer, num_epochs=10, batch_size=8, core=0, need_txt=
                 # wrap them in Variable
                 inputs = inputs.cuda(core)
                 labels = labels.cuda(core)
+                texts = texts.cuda(core)
 
                 if phase == 'train':
-                    inputs, labels = Variable(inputs, volatile=False), Variable(labels, volatile=False)
+                    inputs, labels, texts = Variable(inputs, volatile=False), Variable(labels,
+                                                                                       volatile=False), Variable(texts,
+                                                                                                                 volatile=False)
                 else:
-                    inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
+                    inputs, labels, texts = Variable(inputs, volatile=True), Variable(labels, volatile=True), Variable(
+                        texts,
+                        volatile=True)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
 
                 # forward
+                print(inputs)
+                if need_txt:
+                    inputs = torch.cat(inputs.view(1, -1), texts.view(1, -1))
+                print(inputs)
                 outputs = model(inputs)
                 out_data = outputs.data
                 loss = weighted_BCELoss(outputs, labels, weights=weights)

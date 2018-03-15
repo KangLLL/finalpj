@@ -24,9 +24,9 @@ class ModelX(nn.Module):
         indices = Variable(torch.LongTensor(range(0, 512 * 7 * 7)).cuda(1), volatile=False)
         txt_indices = Variable(torch.LongTensor(range(512 * 7 * 7, 512 * 7 * 7 + 3)).cuda(1), volatile=False)
         
-	print(indices)
+	    print(indices)
 	
-	ix = x[0:512 * 7 * 7]
+	    ix = x[0:512 * 7 * 7]
         tx = x[512 * 7 * 7:]
 
         ix = ix.view(-1, 3, 227, 227)
