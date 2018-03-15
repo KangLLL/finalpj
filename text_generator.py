@@ -7,6 +7,7 @@ def generate_txt_csv(df_all, df, path):
     result = result.rename(index=str,
                            columns={"Image Index": "FileName", "Follow-up #": "#", "Patient Age": "Age",
                                     "Patient Gender": "Gender"})
+    result['Gender'] = result['Gender'].apply(lambda x: 1 if x == 'M' else 0)
     result.to_csv(path, index=False)
 
 
