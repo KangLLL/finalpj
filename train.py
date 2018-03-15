@@ -15,7 +15,8 @@ import time
 import os
 import sys
 
-data_dir = "/scratch/liaoi/images"
+data_dir = "/scratch/liaoi/images_227"
+#data_dir = "/scratch/liaoi/images"
 # data_dir = "../images"
 data_path = {'train': './train.csv', 'test': './test.csv'}
 txt_path = {'train': './train_text.csv', 'test': './test_text.csv'}
@@ -52,9 +53,9 @@ def weighted_BCELoss(output, target, weights=None):
     return torch.sum(loss)
 
 
-def train_model(model, optimizer, num_epochs=10, batch_size=8, core=0):
+def train_model(model, optimizer, num_epochs=10, batch_size=8, core=0, need_txt=False):
     since = time.time()
-    dataloders, dataset_sizes, class_names = loadData(batch_size)
+    dataloders, dataset_sizes, class_names = loadData(batch_size, need_txt=need_txt)
     best_model_wts = model.state_dict()
     best_auc = []
     best_auc_ave = 0
@@ -180,7 +181,7 @@ def saveInfo(model):
 
 if __name__ == '__main__':
     core = 0
-    need_txt = True
+    need_txt = False
     if len(sys.argv) == 2:
         core = int(sys.argv[1])
 
@@ -194,4 +195,4 @@ if __name__ == '__main__':
         lr=1e-4)
 
     model.cuda(core)
-    model = train_model(model, optimizer, num_epochs=5, core=core)
+    model = train_model(model, optimizer, num_epochs=5, core=core, need_txt=need_txt)
