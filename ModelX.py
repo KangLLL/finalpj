@@ -4,7 +4,7 @@ import torch
 from torchvision import models
 
 
-class Model(nn.Module):
+class ModelX(nn.Module):
     def __init__(self):
         super(Model, self).__init__()
         self.model_ft = models.vgg16(pretrained=True)

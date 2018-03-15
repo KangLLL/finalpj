@@ -1,7 +1,9 @@
 from __future__ import print_function
 from __future__ import division
 from Model import Model
+from ModelX import ModelX
 from CXRDataset import CXRDataset
+from CXRDatasetX import CXRDatasetX
 import torch
 import torch.optim as optim
 from torch.autograd import Variable
@@ -11,20 +13,26 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 import time
 import os
+import sys
 
-#data_dir = "/scratch/liaoi/images"
-data_dir = "../images"
-data_path = {'train': "./Train_Label.csv", 'test': "Test_Label.csv"}
+data_dir = "/scratch/liaoi/images"
+# data_dir = "../images"
+data_path = {'train': './train.csv', 'test': './test.csv'}
+txt_path = {'train': './train_text.csv', 'test': './test_text.csv'}
 save_dir = "./savedModels"
 
 
-def loadData(batch_size):
+def loadData(batch_size, need_txt=False):
     trans = transforms.Compose([
-	transforms.Resize([227,227]),
+        # transforms.Resize([227,227]),
         transforms.ToTensor()])
-    image_datasets = {x: CXRDataset(data_path[x], data_dir, transform=trans) for x in ['train', 'test']}
+
+    image_datasets = {x: CXRDatasetX(data_path[x], txt_path[x], data_dir, transform=trans) for x in
+                      ['train', 'test']} if need_txt else {x: CXRDataset(data_path[x], data_dir, transform=trans) for x
+                                                           in ['train', 'test']}
     dataloders = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4)
                   for x in ['train', 'test']}
+
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'test']}
     print('Training data: {}\nTest data: {}'.format(dataset_sizes['train'], dataset_sizes['test']))
 
@@ -44,7 +52,7 @@ def weighted_BCELoss(output, target, weights=None):
     return torch.sum(loss)
 
 
-def train_model(model, optimizer, num_epochs=10, batch_size=2):
+def train_model(model, optimizer, num_epochs=10, batch_size=8, core=0):
     since = time.time()
     dataloders, dataset_sizes, class_names = loadData(batch_size)
     best_model_wts = model.state_dict()
@@ -85,12 +93,12 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
                     BP = (P + N) / P
                     BN = (P + N) / N
                     weights = [BP, BN]
-                    weights = torch.FloatTensor(weights).cuda()
+                    weights = torch.FloatTensor(weights).cuda(core)
                 else:
                     weights = None
                 # wrap them in Variable
-                inputs = inputs.cuda()
-                labels = labels.cuda()
+                inputs = inputs.cuda(core)
+                labels = labels.cuda(core)
 
                 if phase == 'train':
                     inputs, labels = Variable(inputs, volatile=False), Variable(labels, volatile=False)
@@ -137,7 +145,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
                 phase, epoch_loss, epoch_auc_ave, epoch_auc))
             print()
             for i, c in enumerate(class_names):
-        	#print('{}: {:.4f} '.format(c, epoch_auc))
+                # print('{}: {:.4f} '.format(c, epoch_auc))
                 print('{}: {:.4f} '.format(c, epoch_auc[i]))
             print()
 
@@ -155,7 +163,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=2):
     print('Best val AUC: {:4f}'.format(best_auc_ave))
     print()
     for i, c in enumerate(class_names):
-        #print('{}: {:.4f} '.format(c, epoch_auc))
+        # print('{}: {:.4f} '.format(c, epoch_auc))
         print('{}: {:.4f} '.format(c, epoch_auc[i]))
 
     # load best model weights
@@ -171,14 +179,19 @@ def saveInfo(model):
 
 
 if __name__ == '__main__':
-    model = Model()
+    core = 0
+    need_txt = True
+    if len(sys.argv) == 2:
+        core = int(sys.argv[1])
+
+    model = ModelX() if need_txt else Model()
     optimizer = optim.Adam([
-        #{'params': model.transition.parameters()},
-        #{'params': model.globalPool.parameters()},
+        # {'params': model.transition.parameters()},
+        # {'params': model.globalPool.parameters()},
         {'params': model.model_ft.parameters()},
         {'params': model.classifier.parameters()},
         {'params': model.prediction.parameters()}],
         lr=1e-4)
 
-    model.cuda()
-    model = train_model(model, optimizer, num_epochs=5)
+    model.cuda(core)
+    model = train_model(model, optimizer, num_epochs=5, core=core)
