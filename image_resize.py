@@ -31,6 +31,7 @@ target_dir = os.path.join(parent_dir, target)
 
 if not os.path.exists(target_dir):
     shutil.rmtree(target_dir)
+
 os.makedirs(target_dir)
 
 resize_file('./train.csv', target_dir, size)
