@@ -14,7 +14,7 @@ def resize_file(csv_file, source_dir, target_dir, target_size):
             file_path = os.path.join(target_dir, row[0])
             source_path = os.path.join(source_dir, row[0])
 
-            with open(file_path, 'r+b') as f:
+            with open(source_path, 'r+b') as f:
                 with Image.open(f) as image:
                     cover = resizeimage.resize_width(image, target_size)
                     cover.save(file_path, image.format)
