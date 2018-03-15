@@ -23,7 +23,7 @@ size = 227
 source = '/scratch/liaoi/images'
 
 if len(sys.argv) == 2:
-    size = sys.argv[1]
+    size = int(sys.argv[1])
 
 target = 'images_' + str(size)
 
