@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 import torch
 from torchvision import models
 
@@ -20,8 +21,8 @@ class ModelX(nn.Module):
         self.prediction = nn.Sigmoid()
 
     def forward(self, x):
-        indices = torch.LongTensor(range(0, 512 * 7 * 7))
-        txt_indices = torch.LongTensor(range(512 * 7 * 7, 512 * 7 * 7 + 3))
+        indices = Variable(torch.LongTensor(range(0, 512 * 7 * 7)), volatile=False)
+        txt_indices = Variable(torch.LongTensor(range(512 * 7 * 7, 512 * 7 * 7 + 3)), volatile=False)
         ix = torch.index_select(x, 0, indices)
         tx = torch.index_select(x, 0, txt_indices)
 
