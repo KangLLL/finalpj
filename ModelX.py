@@ -6,7 +6,7 @@ from torchvision import models
 
 class ModelX(nn.Module):
     def __init__(self):
-        super(Model, self).__init__()
+        super(ModelX, self).__init__()
         self.model_ft = models.vgg16(pretrained=True)
         self.classifier = nn.Sequential(
             nn.Linear(512 * 7 * 7 + 3, 4096),
