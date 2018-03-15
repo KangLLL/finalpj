@@ -37,7 +37,7 @@ class Model(nn.Module):
 
 	self.model_ft = models.vgg16(pretrained=True)
 	self.classifier = nn.Sequential(
-		nn.Linear(512 * 7 * 7 + 3, 4096),
+		nn.Linear(512 * 7 * 7, 4096),
 		nn.ReLU(True),
 		nn.Dropout(),
 		nn.Linear(4096, 4096),
