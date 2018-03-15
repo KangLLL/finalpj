@@ -29,7 +29,8 @@ target = 'images_' + str(size)
 parent_dir = os.path.dirname(os.path.normpath(source))
 target_dir = os.path.join(parent_dir, target)
 
-shutil.rmtree(target_dir)
+if not os.path.exists(target_dir):
+    shutil.rmtree(target_dir)
 os.makedirs(target_dir)
 
 resize_file('./train.csv', target_dir, size)
