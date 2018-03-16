@@ -5,7 +5,8 @@ from PIL import Image
 from resizeimage import resizeimage
 import pandas as pd
 
-def resize_file(csv_file, source_dir, target_dir, target_size):
+
+def resize_file(csv_file, source_dir, target_dir, target_size, ratio=1.0):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         file_name = row['FileName']
@@ -15,17 +16,23 @@ def resize_file(csv_file, source_dir, target_dir, target_size):
 
         with open(source_path, 'r+b') as f:
             with Image.open(f) as image:
+                width = int(image.width * ratio)
+                image = resizeimage.resize_crop(image, [width, width])
                 cover = resizeimage.resize_width(image, target_size)
+
                 cover.save(file_path, image.format)
 
 
 size = 227
+ratio = 1.0
 source = '/scratch/liaoi/images'
 
 if len(sys.argv) == 2:
     size = int(sys.argv[1])
+if len(sys.argv) == 3:
+    ratio = float(sys.argv[2])
 
-target = 'images_' + str(size)
+target = 'images_' + str(ratio) + '_' + str(size)
 
 source_dir = os.path.normpath(source)
 parent_dir = os.path.dirname(source_dir)
@@ -38,5 +45,3 @@ os.makedirs(target_dir)
 
 resize_file('./train.csv', source_dir, target_dir, size)
 resize_file('./test.csv', source_dir, target_dir, size)
-
-
