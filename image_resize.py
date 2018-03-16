@@ -6,7 +6,7 @@ from resizeimage import resizeimage
 import pandas as pd
 
 
-def resize_file(csv_file, source_dir, target_dir, target_size, ratio=1.0):
+def resize_file(csv_file, source_dir, target_dir, target_size, ratio):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         file_name = row['FileName']
@@ -43,5 +43,5 @@ if os.path.exists(target_dir):
 
 os.makedirs(target_dir)
 
-resize_file('./train.csv', source_dir, target_dir, size)
-resize_file('./test.csv', source_dir, target_dir, size)
+resize_file('./train.csv', source_dir, target_dir, size, ratio)
+resize_file('./test.csv', source_dir, target_dir, size, ratio)
