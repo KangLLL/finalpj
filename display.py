@@ -32,7 +32,9 @@ if __name__ == '__main__':
     train_accuracy = []
     test_accuracy = []
     i = -1
-    with open('txt.txt') as f:
+
+    k = 0
+    with open('txt1.txt') as f:
         for line in f:
             if line.startswith('Epoch'):
                 temp = line.split(' ')[1].split('/')
@@ -47,15 +49,31 @@ if __name__ == '__main__':
 
                 epoch[i].append(int(temp[0]))
 
-            if line.startswith('train Loss'):
-                temp = line.split(' ')
-                train_loss[i].append(float(temp[2]))
-                train_accuracy[i].append(float(temp[4]))
+            # if line.startswith('train Loss'):
+            #     temp = line.split(' ')
+            #     train_loss[i].append(float(temp[2]))
+            #     train_accuracy[i].append(float(temp[4]))
+            #
+            # if line.startswith('test Loss'):
+            #     temp = line.split(' ')
+            #     test_loss[i].append(float(temp[2]))
+            #     test_accuracy[i].append(float(temp[4]))
 
-            if line.startswith('test Loss'):
-                temp = line.split(' ')
-                test_loss[i].append(float(temp[2]))
-                test_accuracy[i].append(float(temp[4]))
+
+            if line.startswith('Mass'):
+                temp = line.split(':')
+                if k == 0:
+                    train_accuracy[i].append(float(temp[1]))
+                    k = 1
+                else:
+                    test_accuracy[i].append(float(temp[1]))
+                    k = 0
+
+    print(train_accuracy)
+    train_accuracy[0] = train_accuracy[0][:-1]
+
+    print(train_accuracy)
+    print(test_accuracy)
 
     train_loss = np.array(train_loss)
     train_accuracy = np.array(train_accuracy)
@@ -63,9 +81,11 @@ if __name__ == '__main__':
     test_accuracy = np.array(test_accuracy)
 
     # showLossCompareFigure(epoch, test_loss, ['x0.9','nx'], 'Loss Comparison')
-    showAccuracyFigure(epoch, test_accuracy, ['no text information','with text information'], 'Accuracy Comparison')
+    # showAccuracyFigure(epoch, test_accuracy, ['no crop','0.9 center crop'], 'Accuracy Comparison')
     # showLossCompareFigure(epoch, train_loss, ['x0.9','nx'], 'Loss Comparison')
     # showAccuracyFigure(epoch, train_accuracy, ['x0.9','nx'], 'Accuracy comparison')
+    showAccuracyFigure([epoch[0], epoch[0]], np.array([train_accuracy[0], test_accuracy[0]]), ['train', 'test'], 'Mass Accuracy')
+    # showLossCompareFigure([epoch[0], epoch[0]], np.array([train_loss[0], test_loss[0]]), ['train', 'test'], 'Loss')
 
 
 

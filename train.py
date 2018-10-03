@@ -98,6 +98,7 @@ def train_model(model, optimizer, num_epochs=10, batch_size=8, core=0, need_txt=
                     weights = torch.FloatTensor(weights).cuda(core)
                 else:
                     weights = None
+                # weights = None
                 # wrap them in Variable
                 inputs = inputs.cuda(core)
                 labels = labels.cuda(core)
